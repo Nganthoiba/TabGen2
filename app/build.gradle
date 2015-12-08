@@ -1,0 +1,35 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.1"
+
+    defaultConfig {
+        applicationId "com.nganthoi.salai.tabgen"
+        minSdkVersion 15
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.android.support:design:23.0.1'
+    compile files('src/main/java/android-support-v4.jar')
+    compile files('src/main/java/apache-mime4j-0.6.jar')
+    compile files('src/main/java/httpmime-4.0.1.jar')
+    compile files('src/main/java/junit3.7.jar')
+    compile files('src/main/java/httpcore-4.0.1.jar')
+    compile files('src/main/java/httpclient-osgi-4.2.1.jar')
+    compile files('src/main/java/httpclient-4.2.3.jar')
+    compile files('src/main/java/httpcore-4.0.1 (1).jar')
+}

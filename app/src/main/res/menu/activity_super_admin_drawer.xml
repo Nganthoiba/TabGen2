@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/AddAdmin"
+            android:icon="@android:drawable/ic_input_add"
+            android:title="Create an Admin account"/>
+        <item android:id="@+id/AddOrg"
+            android:icon="@android:drawable/ic_menu_add"
+            android:title="Create an Organization Unit"/>
+
+    </group>
+
+    <item android:title="Setting">
+        <menu>
+            <item android:icon="@android:drawable/ic_lock_power_off" android:id="@+id/logout"
+                android:title="Logout" />
+        </menu>
+    </item>
+
+</menu>
