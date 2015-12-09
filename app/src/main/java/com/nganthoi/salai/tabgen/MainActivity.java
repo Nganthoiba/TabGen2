@@ -27,26 +27,25 @@ import connectServer.ConnectServer;
 import customDialogManager.CustomDialogManager;
 
 public class MainActivity extends Activity {
-    Button signin, forgotPassword;
+    Button signin;
     Intent intent;
-    Context context;
+    Context context=this;
     String msg, uname, passwd;
     EditText username,password;
     ProgressDialog progressDialog;
-    TextView status;
+    TextView forgotPassword;
     InputStream is;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        context=this;
+        //context=this;
         signin = (Button) findViewById(R.id.signIn);
-        forgotPassword = (Button) findViewById(R.id.forgotPassword);
+        forgotPassword = (TextView) findViewById(R.id.forgotPassword);
         signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 username = (EditText) findViewById(R.id.username);
                 password = (EditText) findViewById(R.id.password);
                 if(isValidate()==true){
@@ -58,7 +57,7 @@ public class MainActivity extends Activity {
                         jsonObject.put("email", uname);//username.getText().toString()
                         jsonObject.put("password", passwd);//password.getText().toString()
                         progressDialog = new ProgressDialog(v.getContext());
-                        progressDialog.setMessage("Wait Please...");
+                        progressDialog.setMessage("  Wait Please.....");
                         progressDialog.setIndeterminate(true);
                         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                         UserLogin ul = new UserLogin();
@@ -78,9 +77,7 @@ public class MainActivity extends Activity {
             }
         });
     }
-    public void ForgotPasswd(){
 
-    }
 
     @Override
     public void onBackPressed(){
@@ -148,7 +145,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private class UserLogin extends AsyncTask<JSONObject,Void,String>{
+    public class UserLogin extends AsyncTask<JSONObject,Void,String>{
         @Override
         protected void onPreExecute(){
             progressDialog.show();
@@ -168,27 +165,35 @@ public class MainActivity extends Activity {
                         sb.append(line +"\n");
                     }
                     is.close();
-                    //Toast.makeText(getApplicationContext(),sb.toString(),Toast.LENGTH_LONG).show();
                     result = sb.toString();
+                    System.out.println("JSON String: "+result);
                 }catch(Exception e){
-                    Toast.makeText(MainActivity.this,"Inappropriate data from server:" + e.toString(),Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                    System.out.println("We have found an exception: \n"+e.toString());
                 }
             }
             else{
-                Toast.makeText(MainActivity.this,"Login failed!",Toast.LENGTH_LONG).show();
+                System.out.println("Error: Input Stream is null......");
+                return null;
             }
             return result;
         }
 
         protected void onProgressUpdate(){
-
+            progressDialog.show();
         }
 
         @Override
         protected  void onPostExecute(String json){
-            if(json!=null)
+            if(json!=null) {
                 parseJSONArray(json);
-            progressDialog.dismiss();
+                progressDialog.dismiss();
+            }else{
+                CustomDialogManager error = new CustomDialogManager(context,"Login Failed","Make sure that the"+
+                        " your login email ID and password are correct",false);
+                error.showCustomDialog();
+                progressDialog.dismiss();
+            }
         }
     }
     private boolean isValidEmail(String email) {

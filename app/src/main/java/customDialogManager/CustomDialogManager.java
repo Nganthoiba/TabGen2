@@ -10,7 +10,7 @@ public class CustomDialogManager {
     private Context context;
     private String title;
     private String message;
-    private Boolean status,state=true;
+    private Boolean status,state=false;
 
     public CustomDialogManager(Context _context,String _title,String _msg,Boolean _status){
         context = _context;
@@ -20,20 +20,20 @@ public class CustomDialogManager {
     }
 
     public Boolean showCustomDialogWithYesNoButton(){
-        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
         if(title!=null) alertDialogBuilder.setTitle(title);
         alertDialogBuilder.setMessage(message);
         if(status){
             alertDialogBuilder.setIcon(R.drawable.success_icon);
         }
         else alertDialogBuilder.setIcon(R.drawable.failure_icon);
-        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 state=true;
                 dialog.cancel();
             }
         });
-        alertDialogBuilder.setPositiveButton("NO", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 state=false;
                 dialog.cancel();
@@ -45,18 +45,19 @@ public class CustomDialogManager {
     }
 
     public void showCustomDialog(){
-        final AlertDialog alertDialog = new AlertDialog.Builder(context).create();
-        alertDialog.setTitle(title);
-        alertDialog.setMessage(message);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+        if(title!=null) alertDialogBuilder.setTitle(title);
+        alertDialogBuilder.setMessage(message);
         if(status){
-            alertDialog.setIcon(R.drawable.success_icon);
+            alertDialogBuilder.setIcon(R.drawable.success_icon);
         }
-        else alertDialog.setIcon(R.drawable.failure_icon);
-        alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+        else alertDialogBuilder.setIcon(R.drawable.failure_icon);
+        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                alertDialog.dismiss();
+                dialog.cancel();
             }
         });
+        AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
 }

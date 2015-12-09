@@ -5,8 +5,10 @@ import android.os.StrictMode;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
@@ -41,11 +43,15 @@ public class ConnectServer {
             conn.setDoOutput(true);
             conn.connect();
             int statusCode = conn.getResponseCode();
-            if(statusCode == HttpURLConnection.HTTP_OK){
+            String message = conn.getResponseMessage();
+            System.out.println("Response Code: "+statusCode+"\nResponse message: "+message);
+            if(statusCode == 200/*HttpURLConnection.HTTP_OK*/){
                 isr = new BufferedInputStream(conn.getInputStream());
             }
             else {
                 isr = null;
+                System.out.println("Response Code: "+statusCode+"\n");
+                convertInputStreamToString(new BufferedInputStream(conn.getErrorStream()));
             }
         }catch(Exception e){
             e.printStackTrace();
@@ -61,7 +67,7 @@ public class ConnectServer {
         try{
             conn = (HttpURLConnection) api_url.openConnection();
             conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("Accept","application/json");
+            conn.setRequestProperty("Accept", "application/json");
             conn.setRequestMethod("POST");
             conn.setDoInput(true);
             conn.setDoOutput(true);
@@ -71,11 +77,15 @@ public class ConnectServer {
             osw.write(parameters.toString());
             osw.flush();
             int statusCode = conn.getResponseCode();
-            if(statusCode == HttpURLConnection.HTTP_OK) {
+            String message = conn.getResponseMessage();
+            System.out.println("Response Code: "+statusCode+"\nResponse message: "+message);
+            if(statusCode == 200) {
                 isr = new BufferedInputStream(conn.getInputStream());
             }
             else{
                 isr = null;
+                System.out.println("Input Stream has been set to null..");
+                convertInputStreamToString(new BufferedInputStream(conn.getErrorStream()));
             }
             osw.close();
         }catch(Exception e){
@@ -94,6 +104,26 @@ public class ConnectServer {
             System.out.println("Encoding error "+ex.toString());
         }
         return is;
+    }
+
+    public void convertInputStreamToString(InputStream inputStream){
+        String result=null;
+        if(inputStream!=null){
+            try{
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"),8);
+                StringBuilder sb = new StringBuilder();
+                String line=null;
+                while((line=reader.readLine())!=null){
+                    sb.append(line +"\n");
+                }
+                inputStream.close();
+                result = sb.toString();
+                System.out.println("Login Failed JSON String: "+result);
+            }catch(Exception e){
+                e.printStackTrace();
+                System.out.println("We have found an exception: \n"+e.toString());
+            }
+        }
     }
 
 }

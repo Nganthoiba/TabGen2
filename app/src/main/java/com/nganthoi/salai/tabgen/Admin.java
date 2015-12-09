@@ -1,11 +1,13 @@
 package com.nganthoi.salai.tabgen;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -13,10 +15,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 public class Admin extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
+    Context _context=this;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,8 +94,23 @@ public class Admin extends AppCompatActivity
             startActivity(new Intent(getApplicationContext(),CreateUserActivity.class));
         }if (id == R.id.logout) {
             // Handle the camera action
-            super.onBackPressed();
-            //startActivity(new Intent(getApplicationContext(),MainActivity.class));
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(_context);
+            alertDialogBuilder.setTitle("Are you sure to logout?");
+            alertDialogBuilder.setIcon(R.drawable.failure_icon);
+            alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    startActivity(new Intent(_context,MainActivity.class));
+                    finish();
+                }
+            });
+            alertDialogBuilder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
