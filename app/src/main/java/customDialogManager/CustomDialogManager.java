@@ -10,13 +10,38 @@ public class CustomDialogManager {
     private Context context;
     private String title;
     private String message;
-    private Boolean status;
+    private Boolean status,state=true;
 
     public CustomDialogManager(Context _context,String _title,String _msg,Boolean _status){
         context = _context;
         title = _title;
         message = _msg;
         status = _status;
+    }
+
+    public Boolean showCustomDialogWithYesNoButton(){
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+        if(title!=null) alertDialogBuilder.setTitle(title);
+        alertDialogBuilder.setMessage(message);
+        if(status){
+            alertDialogBuilder.setIcon(R.drawable.success_icon);
+        }
+        else alertDialogBuilder.setIcon(R.drawable.failure_icon);
+        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                state=true;
+                dialog.cancel();
+            }
+        });
+        alertDialogBuilder.setPositiveButton("NO", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                state=false;
+                dialog.cancel();
+            }
+        });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+        return state;
     }
 
     public void showCustomDialog(){
