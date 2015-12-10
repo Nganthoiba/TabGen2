@@ -5,9 +5,15 @@
         <item android:id="@+id/AddAdmin"
             android:icon="@android:drawable/ic_input_add"
             android:title="Create an Admin account"/>
-        <item android:id="@+id/AddOrg"
+        <item android:id="@+id/CreateOrgUnit"
             android:icon="@android:drawable/ic_menu_add"
             android:title="Create an Organization Unit"/>
+        <item android:id="@+id/CreateOrganisation"
+            android:icon="@android:drawable/ic_input_get"
+            android:title="Create an Organisation"/>
+        <item android:id="@+id/findByOrgName"
+            android:icon="@android:drawable/ic_search_category_default"
+            android:title="Find an Organisation by name"/>
 
     </group>
 

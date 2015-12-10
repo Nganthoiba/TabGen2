@@ -1,12 +1,15 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle" >
     <gradient
-        android:startColor="#ee5997"
-        android:centerColor="#ee619c"
-        android:endColor="#c7c7c7"
+        android:startColor="#943705"
+        android:centerColor="#943705"
+        android:endColor="#943705"
         android:type="linear"
         android:angle="135"/>
 </shape>
     <!--android:startColor="#81C784"
             android:centerColor="#4CAF50"
-            android:endColor="#6eb972"-->
+            android:endColor="#6eb972"
+            #ee5997
+            #ee619c
+            "#c7c7c7"-->

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,9 +17,7 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,14 +34,16 @@ public class MainActivity extends Activity {
     ProgressDialog progressDialog;
     TextView forgotPassword;
     InputStream is;
+    ConnectServer cs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //context=this;
         signin = (Button) findViewById(R.id.signIn);
         forgotPassword = (TextView) findViewById(R.id.forgotPassword);
+        //forgotPassword.setPaintFlags(forgotPassword.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
+        forgotPassword.setText(Html.fromHtml("<u><i>Forgot Password ?</i></u>"));
         signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -72,7 +73,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Uri forgotPassword = Uri.parse("http://188.166.210.24:8065/org2/reset_password");
-                intent = new Intent(Intent.ACTION_VIEW,forgotPassword);
+                intent = new Intent(Intent.ACTION_VIEW, forgotPassword);
                 startActivity(intent);
             }
         });
@@ -114,36 +115,6 @@ public class MainActivity extends Activity {
         }
         return true;
     }
-    public void parseJSONArray(String json) {
-        if(json==null)
-            return;
-        else{
-            JSONObject jObj=null;
-            try {
-                jObj=new JSONObject(json);
-                //JSONArray jsonArray1 = jObj.getJSONArray("notify_props");
-                switch(jObj.getString("roles")){
-                    case "admin":
-                        intent = new Intent(context,Admin.class);
-                        Toast.makeText(MainActivity.this,"Sucessfully login as admin...",Toast.LENGTH_LONG).show();
-                        startActivity(intent);
-                        break;
-                    case "superadmin":
-                        intent = new Intent(context,SuperAdminActivity.class);
-                        Toast.makeText(context,"Sucessfully login as superadmin...",Toast.LENGTH_LONG).show();
-                        startActivity(intent);
-                        break;
-                    case "users":
-                        Toast.makeText(context,"Sucessfully login as user...",Toast.LENGTH_LONG).show();
-                        break;
-                    default:
-                        Toast.makeText(context,"Status Code: "+jObj.getInt("Status_code"),Toast.LENGTH_LONG).show();
-                }
-            }catch(JSONException e){
-                System.out.println("JSON Exception occurs here: " + e.toString()+"\n the JSON is: "+jObj.toString());
-            }
-        }
-    }
 
     public class UserLogin extends AsyncTask<JSONObject,Void,String>{
         @Override
@@ -153,29 +124,10 @@ public class MainActivity extends Activity {
 
         @Override
         protected String doInBackground(JSONObject... jObj){
-            ConnectServer cs = new ConnectServer("http://188.166.210.24:8065/api/v1/users/login");
+            cs = new ConnectServer("http://188.166.210.24:8065/api/v1/users/login");
             String result=null;
             is = cs.putData(jObj[0]);
-            if(is!=null){
-                try{
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
-                    StringBuilder sb = new StringBuilder();
-                    String line=null;
-                    while((line=reader.readLine())!=null){
-                        sb.append(line +"\n");
-                    }
-                    is.close();
-                    result = sb.toString();
-                    System.out.println("JSON String: "+result);
-                }catch(Exception e){
-                    e.printStackTrace();
-                    System.out.println("We have found an exception: \n"+e.toString());
-                }
-            }
-            else{
-                System.out.println("Error: Input Stream is null......");
-                return null;
-            }
+            result = cs.convertInputStreamToString(is);
             return result;
         }
 
@@ -185,15 +137,43 @@ public class MainActivity extends Activity {
 
         @Override
         protected  void onPostExecute(String json){
-            if(json!=null) {
-                parseJSONArray(json);
-                progressDialog.dismiss();
-            }else{
-                CustomDialogManager error = new CustomDialogManager(context,"Login Failed","Make sure that the"+
-                        " your login email ID and password are correct",false);
-                error.showCustomDialog();
-                progressDialog.dismiss();
+            if(json!=null){
+                JSONObject jObj=null;
+                try {
+                    jObj=new JSONObject(json);
+                    if(cs.responseCode==200){
+                        switch(jObj.getString("roles")){
+                            case "superadmin":
+                                intent = new Intent(context,Admin.class);
+                                Toast.makeText(MainActivity.this, "Sucessfully login as admin...", Toast.LENGTH_LONG).show();
+                                startActivity(intent);
+                                break;
+                            case "admin":
+                                intent = new Intent(context,SuperAdminActivity.class);
+                                Toast.makeText(context,"Sucessfully login as superadmin...",Toast.LENGTH_LONG).show();
+                                startActivity(intent);
+                                break;
+                            case "users":
+                                Toast.makeText(context,"Sucessfully login as user...",Toast.LENGTH_LONG).show();
+                                break;
+                            default:
+                                Toast.makeText(context,"Status Code: "+jObj.getInt("Status_code"),Toast.LENGTH_LONG).show();
+                        }
+                    }
+                    else if(cs.responseCode==-1)
+                    {
+                        CustomDialogManager error = new CustomDialogManager(context,"Login Failed",cs.errorMessage,false);
+                        error.showCustomDialog();
+                    }
+                    else {
+                        CustomDialogManager error = new CustomDialogManager(context,"Login Failed",jObj.getString("message"),false);
+                        error.showCustomDialog();
+                    }
+                }catch(JSONException e){
+                    System.out.println("JSON Exception occurs here: " + e.toString()+"\n the JSON is: "+jObj.toString());
+                }
             }
+            progressDialog.dismiss();
         }
     }
     private boolean isValidEmail(String email) {

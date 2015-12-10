@@ -95,7 +95,8 @@ public class Admin extends AppCompatActivity
         }if (id == R.id.logout) {
             // Handle the camera action
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(_context);
-            alertDialogBuilder.setTitle("Are you sure to logout?");
+            alertDialogBuilder.setTitle("Logout ?");
+            alertDialogBuilder.setMessage("Are you sure to logout?");
             alertDialogBuilder.setIcon(R.drawable.failure_icon);
             alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {

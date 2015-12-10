@@ -21,6 +21,8 @@ import java.net.URL;
 public class ConnectServer {
     //String API_URL="";
     InputStream isr=null;
+    public int responseCode;
+    public String responseMessage, errorMessage;
     URL api_url=null;
     HttpURLConnection conn=null;
     public ConnectServer(String web_api){
@@ -42,19 +44,20 @@ public class ConnectServer {
             conn.setDoInput(true);
             conn.setDoOutput(true);
             conn.connect();
-            int statusCode = conn.getResponseCode();
-            String message = conn.getResponseMessage();
-            System.out.println("Response Code: "+statusCode+"\nResponse message: "+message);
-            if(statusCode == 200/*HttpURLConnection.HTTP_OK*/){
+            responseCode = conn.getResponseCode();
+            responseMessage = conn.getResponseMessage();
+            System.out.println("Response Code: "+responseCode+"\nResponse message: "+responseMessage);
+            if(responseCode == 200/*HttpURLConnection.HTTP_OK*/){
                 isr = new BufferedInputStream(conn.getInputStream());
             }
             else {
-                isr = null;
-                System.out.println("Response Code: "+statusCode+"\n");
-                convertInputStreamToString(new BufferedInputStream(conn.getErrorStream()));
+                isr = new BufferedInputStream(conn.getErrorStream());
             }
         }catch(Exception e){
             e.printStackTrace();
+            errorMessage = e.toString();
+            responseCode=-1;
+            System.out.println("Exception occurs here: " + e.toString());
         }
         return isr;
     }
@@ -76,27 +79,27 @@ public class ConnectServer {
             osw = new OutputStreamWriter(os);
             osw.write(parameters.toString());
             osw.flush();
-            int statusCode = conn.getResponseCode();
-            String message = conn.getResponseMessage();
-            System.out.println("Response Code: "+statusCode+"\nResponse message: "+message);
-            if(statusCode == 200) {
+            responseCode = conn.getResponseCode();
+            responseMessage = conn.getResponseMessage();
+            System.out.println("Response Code: "+responseCode+"\nResponse message: "+responseMessage);
+            if(responseCode == 200) {
                 isr = new BufferedInputStream(conn.getInputStream());
             }
             else{
-                isr = null;
-                System.out.println("Input Stream has been set to null..");
-                convertInputStreamToString(new BufferedInputStream(conn.getErrorStream()));
+                isr = new BufferedInputStream(conn.getErrorStream());
             }
             osw.close();
         }catch(Exception e){
             e.printStackTrace();
-            System.out.println("Exception occurs here...." + e.toString());
+            errorMessage = e.toString();
+            responseCode=-1;
+            System.out.println("No no no Exception occurs here: " + e.toString());
             isr = null;
         }
         return isr;
     }
 
-    public InputStream stringToInputStream(String string){
+    public InputStream convertStringToInputStream(String string){
         InputStream is=null;
         try{
             is = new ByteArrayInputStream(string.getBytes("UTF-8"));
@@ -106,7 +109,7 @@ public class ConnectServer {
         return is;
     }
 
-    public void convertInputStreamToString(InputStream inputStream){
+    public String convertInputStreamToString(InputStream inputStream){
         String result=null;
         if(inputStream!=null){
             try{
@@ -118,12 +121,13 @@ public class ConnectServer {
                 }
                 inputStream.close();
                 result = sb.toString();
-                System.out.println("Login Failed JSON String: "+result);
+                System.out.println("JSON String: "+result);
             }catch(Exception e){
                 e.printStackTrace();
                 System.out.println("We have found an exception: \n"+e.toString());
             }
         }
+        return result;
     }
 
 }
