@@ -148,7 +148,7 @@ public class MainActivity extends Activity {
                                 Toast.makeText(MainActivity.this, "Sucessfully login as admin...", Toast.LENGTH_LONG).show();
                                 startActivity(intent);
                                 break;
-                            case "admin":
+                            case "admin"://For the time being I have change the access right of admin to work Super Admin's task
                                 intent = new Intent(context,SuperAdminActivity.class);
                                 Toast.makeText(context,"Sucessfully login as superadmin...",Toast.LENGTH_LONG).show();
                                 startActivity(intent);
