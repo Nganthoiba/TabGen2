@@ -71,4 +71,14 @@
         android:layout_below="@+id/company_name"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="48dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Small Text"
+        android:id="@+id/textView8"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="183dp" />
 </RelativeLayout>

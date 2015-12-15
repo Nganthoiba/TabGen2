@@ -70,7 +70,7 @@ public class ConnectServer {
         try{
             conn = (HttpURLConnection) api_url.openConnection();
             conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("Accept", "application/json");
+            //conn.setRequestProperty("Accept", "application/json");
             conn.setRequestMethod("POST");
             conn.setDoInput(true);
             conn.setDoOutput(true);
@@ -93,7 +93,7 @@ public class ConnectServer {
             e.printStackTrace();
             errorMessage = e.toString();
             responseCode=-1;
-            System.out.println("No no no Exception occurs here: " + e.toString());
+            System.out.println("Server Not Found Exception occurs here: " + e.toString());
             isr = null;
         }
         return isr;

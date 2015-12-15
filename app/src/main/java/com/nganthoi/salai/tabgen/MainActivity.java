@@ -29,8 +29,8 @@ public class MainActivity extends Activity {
     Button signin;
     Intent intent;
     Context context=this;
-    String msg, uname, passwd;
-    EditText username,password;
+    String msg, org,uname, passwd;
+    EditText org_name,username,password;
     ProgressDialog progressDialog;
     TextView forgotPassword;
     InputStream is;
@@ -41,20 +41,23 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         signin = (Button) findViewById(R.id.signIn);
+        org_name = (EditText) findViewById(R.id.organisation_name);
+        username = (EditText) findViewById(R.id.username);
+        password = (EditText) findViewById(R.id.password);
         forgotPassword = (TextView) findViewById(R.id.forgotPassword);
         //forgotPassword.setPaintFlags(forgotPassword.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
         forgotPassword.setText(Html.fromHtml("<u><i>Forgot Password ?</i></u>"));
         signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                username = (EditText) findViewById(R.id.username);
-                password = (EditText) findViewById(R.id.password);
+
                 if(isValidate()==true){
                     try {
                         uname = username.getText().toString().trim();
                         passwd = password.getText().toString().trim();
+                        org = org_name.getText().toString().trim();
                         JSONObject jsonObject= new JSONObject();
-                        jsonObject.put("name", "org2");
+                        jsonObject.put("name", org);
                         jsonObject.put("email", uname);//username.getText().toString()
                         jsonObject.put("password", passwd);//password.getText().toString()
                         progressDialog = new ProgressDialog(v.getContext());
@@ -89,7 +92,13 @@ public class MainActivity extends Activity {
         CheckInternetConnection ic = new CheckInternetConnection(this);
         CustomDialogManager cdm;
         Boolean testInternet = ic.isMobileInternetConnected()||ic.isWifiInternetConnected();
-        if(username.getText().toString().trim().length()==0){
+        if(org_name.getText().toString().trim().length()==0){
+            msg="Please enter your organisation name";
+            cdm =  new CustomDialogManager(MainActivity.this,"Organisation name empty",msg,false);
+            cdm.showCustomDialog();
+            return false;
+        }
+        else if(username.getText().toString().trim().length()==0){
             msg="Please enter your email ID";
             cdm =  new CustomDialogManager(MainActivity.this,"Email empty",msg,false);
             cdm.showCustomDialog();
@@ -107,12 +116,13 @@ public class MainActivity extends Activity {
             cdm.showCustomDialog();
             return false;
         }
+        /*
         else if(!testInternet){
             msg="You device is not connected to internet. Please check your connection!";
             cdm =  new CustomDialogManager(MainActivity.this,"Internet Connection",msg,false);
             cdm.showCustomDialog();
             return false;
-        }
+        }*/
         return true;
     }
 
@@ -142,15 +152,16 @@ public class MainActivity extends Activity {
                 try {
                     jObj=new JSONObject(json);
                     if(cs.responseCode==200){
+                        progressDialog.dismiss();
                         switch(jObj.getString("roles")){
-                            case "superadmin":
-                                intent = new Intent(context,Admin.class);
-                                Toast.makeText(MainActivity.this, "Sucessfully login as admin...", Toast.LENGTH_LONG).show();
+                            case "system_admin":
+                                intent = new Intent(context,SuperAdminActivity.class);
+                                Toast.makeText(MainActivity.this, "Sucessfully login as Superadmin...", Toast.LENGTH_LONG).show();
                                 startActivity(intent);
                                 break;
-                            case "admin"://For the time being I have change the access right of admin to work Super Admin's task
-                                intent = new Intent(context,SuperAdminActivity.class);
-                                Toast.makeText(context,"Sucessfully login as superadmin...",Toast.LENGTH_LONG).show();
+                            case "admin":
+                                intent = new Intent(context,Admin.class);
+                                Toast.makeText(context,"Sucessfully login as Admin...",Toast.LENGTH_LONG).show();
                                 startActivity(intent);
                                 break;
                             case "users":
@@ -159,19 +170,21 @@ public class MainActivity extends Activity {
                             default:
                                 Toast.makeText(context,"Status Code: "+jObj.getInt("Status_code"),Toast.LENGTH_LONG).show();
                         }
-                    }
-                    else if(cs.responseCode==-1)
-                    {
-                        CustomDialogManager error = new CustomDialogManager(context,"Login Failed",cs.errorMessage,false);
-                        error.showCustomDialog();
+
                     }
                     else {
+                        progressDialog.dismiss();
                         CustomDialogManager error = new CustomDialogManager(context,"Login Failed",jObj.getString("message"),false);
-                        error.showCustomDialog();
                     }
                 }catch(JSONException e){
                     System.out.println("JSON Exception occurs here: " + e.toString()+"\n the JSON is: "+jObj.toString());
                 }
+            }
+            else
+            {
+                CustomDialogManager error = new CustomDialogManager(context,"Server Problem","Failed to connect server",false);
+                error.showCustomDialog();
+
             }
             progressDialog.dismiss();
         }
